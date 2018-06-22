@@ -141,7 +141,7 @@ class GenericOAuthenticator(OAuthenticator):
         if not auth_state:
             # auth_state not enabled
             return
-        spawner.environment['AUTH_TOKEN'] = auth_state
+        spawner.environment['AUTH_TOKEN'] = auth_state['access_token']
 
 
 class LocalGenericOAuthenticator(LocalAuthenticator, GenericOAuthenticator):
