@@ -95,6 +95,7 @@ class GenericOAuthenticator(OAuthenticator):
         req = HTTPRequest(url,
                           method="POST",
                           headers=headers,
+                          validate_cert=False,
                           body=urllib.parse.urlencode(params)  # Body is required for a POST...
                           )
 
@@ -115,6 +116,7 @@ class GenericOAuthenticator(OAuthenticator):
 
         req = HTTPRequest(url,
                           method=self.userdata_method,
+                          validate_cert=False,
                           headers=headers,
                           )
         resp = yield http_client.fetch(req)
@@ -131,6 +133,15 @@ class GenericOAuthenticator(OAuthenticator):
                 'oauth_user': resp_json,
             }
         }
+
+    @gen.coroutine
+    def pre_spawn_start(self, user, spawner):
+        """Pass upstream_token to spawner via environment variable"""
+        auth_state = yield user.get_auth_state()
+        if not auth_state:
+            # auth_state not enabled
+            return
+        spawner.environment['AUTH_TOKEN'] = auth_state
 
 
 class LocalGenericOAuthenticator(LocalAuthenticator, GenericOAuthenticator):
